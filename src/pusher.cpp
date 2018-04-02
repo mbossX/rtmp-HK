@@ -11,7 +11,7 @@ DWORD WINAPI g_tCallback(LPVOID ptr)
     {
         return (DWORD)((Pusher *)ptr)->tCallback();
     }
-	return 0;
+    return 0;
 }
 #elif defined(__linux__) || defined(__APPLE__)
 void *g_tCallback(void *ptr)
@@ -27,7 +27,9 @@ int Pusher::init()
 {
     //init rtmp
     this->rtmp = srs_rtmp_create(this->url_);
-	srs_rtmp_set_timeout(rtmp, 500, 500);
+#ifdef _WIN32
+    srs_rtmp_set_timeout(rtmp, 500, 500);
+#endif
     int ret = srs_rtmp_handshake(this->rtmp);
     if (ret != 0)
     {

@@ -1,3 +1,10 @@
 /lib/
 *.o
 *.so
+*.dpp
+*.dll
+*.exe
+Debug
+Release
+x64
+*.sdf
