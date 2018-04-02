@@ -8,7 +8,6 @@
 * Create Date��2010_3_25
 * Modification History��
 */
-
 #ifndef _NET_DVR_STREAM_H_
 #define _NET_DVR_STREAM_H_
 
@@ -24,7 +23,7 @@ public:
   int Init();
   void RealDataCallBack_V40(NET_DVR_PACKET_INFO_EX *pack);
   void RealDataCallBack_V402(DWORD dwDataType, BYTE *pBuffer, DWORD dwBufferSize);
-  void ExceptionCallBack(DWORD dwType);
+  void exceptionCallBack(DWORD dwType);
 
 private:
   long lRealPlayHandle;

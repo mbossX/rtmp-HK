@@ -229,6 +229,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * only support the following cpus: i386/amd64/x86_64/arm
  * @reamrk to patch ST for arm, read https://github.com/ossrs/state-threads/issues/1
  */
+#define __x86_64__
 #if !defined(__amd64__) && !defined(__x86_64__) && !defined(__i386__) && !defined(__arm__)
     #error "only support i386/amd64/x86_64/arm cpu"
 #endif
@@ -35520,7 +35521,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         microsec = srs_max(0, microsec);
         
         struct timeval tv = { sec , microsec };
-        if (setsockopt(skt->fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) == -1) {
+        if (setsockopt(skt->fd, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof(tv)) == -1) {
             return SOCKET_ERRNO();
         }
         skt->recv_timeout = timeout_us;
@@ -35548,7 +35549,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         microsec = srs_max(0, microsec);
 
         struct timeval tv = { sec , microsec };
-        if (setsockopt(skt->fd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv)) == -1) {
+        if (setsockopt(skt->fd, SOL_SOCKET, SO_SNDTIMEO, (char*)&tv, sizeof(tv)) == -1) {
             return SOCKET_ERRNO();
         }
 

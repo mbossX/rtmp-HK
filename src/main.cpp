@@ -28,6 +28,9 @@ const int cache_second = 10;
 
 int main()
 {
+#ifdef W_IN32
+	set_recc
+#endif
     Link link;
     Cache cache(cache_second * fr_send, &link);
 
@@ -47,15 +50,15 @@ int main()
     sleep(cache_second * ((float)fr_send / (float)fr_fetch));
 #endif
     ret = pusher.start();
-    while (1)
-    {
 
 #ifdef _WIN32
         system("pause");
 #elif defined(__linux__) || defined(__APPLE__)
+    while (1)
+    {
         pause();
-#endif
     }
+#endif
 
 cleanup:
     fetcher.Cleanup();

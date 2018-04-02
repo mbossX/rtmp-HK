@@ -9,8 +9,9 @@ DWORD WINAPI g_tCallback(LPVOID ptr)
 {
     if (ptr != NULL)
     {
-        return ((Pusher *)ptr)->tCallback();
+        return (DWORD)((Pusher *)ptr)->tCallback();
     }
+	return 0;
 }
 #elif defined(__linux__) || defined(__APPLE__)
 void *g_tCallback(void *ptr)
@@ -26,6 +27,7 @@ int Pusher::init()
 {
     //init rtmp
     this->rtmp = srs_rtmp_create(this->url_);
+	srs_rtmp_set_timeout(rtmp, 500, 500);
     int ret = srs_rtmp_handshake(this->rtmp);
     if (ret != 0)
     {
@@ -53,7 +55,7 @@ int Pusher::init()
         // init thread
 #ifdef _WIN32
     this->tid = CreateThread(NULL, 0, g_tCallback, this, 0, NULL);
-    if (*this->tid == FALSE)
+    if (this->tid == FALSE)
     {
         cout << "init thread error " << ret << endl;
         return HPR_ERROR;
@@ -82,10 +84,10 @@ int Pusher::start()
     }
     cout << "init rtmp success" << endl;
 #ifdef _WIN32
-    DWORD ret = WaitForSingleObject(this->tid, INFINITE);
+    DWORD retW = WaitForSingleObject(this->tid, INFINITE);
     if (ret != 0)
     {
-        this->tid = -1;
+        this->tid = NULL;
         // restart
         return this->start();
     }

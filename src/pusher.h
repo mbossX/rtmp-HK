@@ -1,7 +1,8 @@
 #ifndef _PUSHER_H_
 #define _PUSHER_H_
-
+#if defined(__linux__) || defined(__APPLE__)
 #include <pthread.h>
+#endif
 #include "cache.h"
 #include "srs/srs_librtmp.h"
 
@@ -12,7 +13,6 @@ class Pusher
 public:
   Pusher()
   {
-    this->tid = -1;
   };
   Pusher(char *url, int fr, Cache *cache, Link *link);
   ~Pusher();
