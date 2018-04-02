@@ -1,0 +1,2 @@
+NET_DVR_Stream.o: src/NET_DVR_Stream.cpp include/HCNetSDK.h src/public.h \
+ src/../include/HCNetSDK.h src/NET_DVR_Stream.h
