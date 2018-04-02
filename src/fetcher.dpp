@@ -1,2 +1,0 @@
-fetcher.o: src/fetcher.cpp src/fetcher.h src/cache.h src/public.h \
- src/../include/HCNetSDK.h

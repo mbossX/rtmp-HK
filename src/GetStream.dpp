@@ -1,2 +1,0 @@
-GetStream.o: src/GetStream.cpp include/HCNetSDK.h src/public.h \
- src/../include/HCNetSDK.h src/GetStream.h

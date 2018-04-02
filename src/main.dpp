@@ -1,2 +1,0 @@
-main.o: src/main.cpp src/cache.h src/public.h src/../include/HCNetSDK.h \
- src/pusher.h src/srs/srs_librtmp.h src/fetcher.h

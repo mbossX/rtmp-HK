@@ -1,2 +1,0 @@
-pusher.o: src/pusher.cpp src/pusher.h src/cache.h src/public.h \
- src/../include/HCNetSDK.h src/srs/srs_librtmp.h

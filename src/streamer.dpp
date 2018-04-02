@@ -1,2 +1,0 @@
-streamer.o: src/streamer.cpp include/HCNetSDK.h src/public.h \
- src/../include/HCNetSDK.h src/streamer.h
