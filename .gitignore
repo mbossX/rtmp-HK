@@ -8,3 +8,4 @@ Debug
 Release
 x64
 *.sdf
+.vscode
