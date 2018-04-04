@@ -17,51 +17,97 @@
 
 #include <stdio.h>
 #include <iostream>
-#include "cache.h"
-#include "pusher.h"
-#include "fetcher.h"
+#include <fstream>
+#include "camera.hpp"
 using namespace std;
+using namespace streamPusher;
 
-const int fr_send = 6;
-const int fr_fetch = 6;
-const int cache_second = 10;
-
-int main()
+int main(int argc, char **args)
 {
-#ifdef W_IN32
-	set_recc
-#endif
-    Link link;
-    Cache cache(cache_second * fr_send, &link);
-
-    Fetcher fetcher("172.16.1.205", 12202, "mboss", "mjl04140906", &cache, &link);
-    Pusher pusher("rtmp://172.16.1.90/live/lt", fr_send, &cache, &link);
-
-    int ret = fetcher.Init();
-    if (ret != HPR_OK)
+    // int fr_send = 6;
+    // int fr_fetch = 6;
+    // int cache_second = 10;
+    Config config;
+    Camera *cameras = NULL;
+    // read config json file
+    /*
     {
-        cout << "init fetcher error " << ret << endl;
+        "cameras": [
+            {
+                "id": "C001",
+                "ip": "172.16.1.205",
+                "port": 12202,
+                "user": "mboss",
+                "password": "mjl04140906",
+                "framerate": 6,
+                "rtmp":{
+                    "url": "rtmp://172.16.1.90/live/C001",
+                    "framerate": 6
+                }
+            }
+        ]
+    }
+    */
+    json cJson;
+    if (argc > 1)
+    {
+        ifstream infile;
+        infile.open(args[1]);
+        if (!infile.is_open())
+        {
+            cout << "config file " << args[1] << " did not exists!" << endl;
+            return 1;
+        }
+        string data((istreambuf_iterator<char>(infile)),
+                    istreambuf_iterator<char>());
+
+        // cout << "config is" << endl
+        //      << data << endl;
+        infile.close();
+        using json = nlohmann::json;
+        cJson = json::parse(data);
+        config.from_json(cJson);
+        // cout << config.cameras[0].rtmp[0].id_ << endl;
+
+        cameras = new Camera[config.length];
+        for (int i = 0; i < config.length; i++)
+        {
+            cameras[i] = Camera(&config.cameras[i]);
+            if (cameras[i].start() != HPR_OK)
+            {
+                cout << "camera " << config.cameras[i].id_ << " start fail!" << endl;
+            }
+            else
+            {
+                cout << "start camera " << config.cameras[i].id_ << " success!" << endl;
+            }
+        }
+    }
+    else
+    {
+        cout << "need config file!" << endl;
         goto cleanup;
     }
-    cout << "init dvr success" << endl;
-#ifdef _WIN32
-        Sleep(cache_second * ((float)fr_send / (float)fr_fetch) * 1000);
-#elif defined(__linux__) || defined(__APPLE__)
-    sleep(cache_second * ((float)fr_send / (float)fr_fetch));
-#endif
-    ret = pusher.start();
 
-#ifdef _WIN32
-        system("pause");
-#elif defined(__linux__) || defined(__APPLE__)
-    while (1)
-    {
-        pause();
-    }
-#endif
+    // #ifdef _WIN32
+    //     system("pause");
+    // #elif defined(__linux__) || defined(__APPLE__)
+    //     while (1)
+    //     {
+    //         pause();
+    //     }
+    // #endif
 
 cleanup:
-    fetcher.Cleanup();
-    pusher.stop();
+    if (cameras != NULL)
+    {
+        for (int i = 0; i < config.length; i++)
+        {
+            cameras[i].Cleanup();
+        }
+        delete[] cameras;
+    }
+    // fetcher.Cleanup();
+    // pusher.stop();
     return 0;
 }

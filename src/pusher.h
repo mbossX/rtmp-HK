@@ -4,28 +4,30 @@
 #include <pthread.h>
 #endif
 #include "cache.h"
-#include "srs/srs_librtmp.h"
+#include "srs/rtmp.hpp"
+#include "config.hpp"
 
 using namespace std;
-
+namespace streamPusher
+{
 class Pusher
 {
 public:
-  Pusher()
-  {
-  };
-  Pusher(char *url, int fr, Cache *cache, Link *link);
+  Pusher();
+  Pusher(Camera_ *c, Cache *cache, Link *link);
   ~Pusher();
   int start();
   void stop();
   void *tCallback();
 
 private:
-  char *url_;
-  int fr_; // frame rate
-  srs_rtmp_t rtmp;
+  Rtmp *rtmp;
+  int length;
   Cache *cache_;
   Link *link_;
+  const char *url_;
+  int fr_; // frame rate
+  const char* id_;
   bool running;
   double dt;
   unsigned long times;
@@ -39,5 +41,5 @@ private:
   int doSleep(float st);
   int send();
 };
-
+}
 #endif

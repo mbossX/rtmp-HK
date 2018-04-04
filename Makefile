@@ -21,19 +21,19 @@ OBJSPATH = $(addprefix obj/,$(OBJFILE))
 
 LIBPATH = ./lib/
 LIBS = -Wl,-rpath=./:./HCNetSDKCom:../lib -lhcnetsdk
-EXE = ./lib/demo
+EXE = ./lib/rtmp-HK
 #-lpthread
 $(EXE):$(OBJFILE)
-	$(CXX) -L$(LIBPATH)  -o $(EXE) $(OBJFILE) $(INCPATHS) $(LIBS) -lpthread
+	$(CXX) -L$(LIBPATH)  -o $(EXE) $(OBJFILE) $(INCPATHS) $(LIBS) -lpthread -std=c++11
 
 $(OBJFILE):%.o:%.cpp
-	$(CXX)  -c -o $@ $<  $(INCPATHS) -pipe -g -Wall
+	$(CXX)  -c -o $@ $<  $(INCPATHS) -pipe -g -Wall -std=c++11
 
 #依赖文件
 DPPS = $(patsubst %.cpp,%.dpp,$(SOURCE))
 include $(DPPS)
 %.dpp: %.cpp	
-	g++ $(INCPATHS) -MM $(CPPFLAGS) $< > $@.$$$$; \
+	g++ $(INCPATHS) -MM $(CPPFLAGS) $< > $@.$$$$ -std=c++11; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$ 
 	

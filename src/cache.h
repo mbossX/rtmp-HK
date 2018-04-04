@@ -2,10 +2,12 @@
 #define _CACHE_H_
 
 #include "public.h"
-
+namespace streamPusher
+{
 class Cache
 {
   public:
+    Cache(){};
     Cache(int capacity, Link *link)
     {
         this->capacity = capacity;
@@ -35,7 +37,7 @@ class Cache
         }
 
         this->q_.push(item);
-        // this->tmpTimer = 0;
+        // cout<<size<<endl;
     };
     VideoBuffer pop()
     {
@@ -60,5 +62,5 @@ class Cache
     queue<VideoBuffer> q_;
     Link *link_;
 };
-
+}
 #endif

@@ -10,24 +10,26 @@
 */
 
 #include "fetcher.h"
+namespace streamPusher
+{
 #ifdef _WIN32
 int gettimeofday(struct timeval *tp, void *tzp)
 {
-  time_t clock;
-  struct tm tm;
-  SYSTEMTIME wtm;
-  GetLocalTime(&wtm);
-  tm.tm_year   = wtm.wYear - 1900;
-  tm.tm_mon   = wtm.wMonth - 1;
-  tm.tm_mday   = wtm.wDay;
-  tm.tm_hour   = wtm.wHour;
-  tm.tm_min   = wtm.wMinute;
-  tm.tm_sec   = wtm.wSecond;
-  tm. tm_isdst  = -1;
-  clock = mktime(&tm);
-  tp->tv_sec = clock;
-  tp->tv_usec = wtm.wMilliseconds * 1000;
-  return (0);
+    time_t clock;
+    struct tm tm;
+    SYSTEMTIME wtm;
+    GetLocalTime(&wtm);
+    tm.tm_year = wtm.wYear - 1900;
+    tm.tm_mon = wtm.wMonth - 1;
+    tm.tm_mday = wtm.wDay;
+    tm.tm_hour = wtm.wHour;
+    tm.tm_min = wtm.wMinute;
+    tm.tm_sec = wtm.wSecond;
+    tm.tm_isdst = -1;
+    clock = mktime(&tm);
+    tp->tv_sec = clock;
+    tp->tv_usec = wtm.wMilliseconds * 1000;
+    return (0);
 }
 #endif
 #ifndef TIMESTAMP
@@ -175,7 +177,7 @@ int Fetcher::GetStream_V40()
     int ret = NET_DVR_SetESRealPlayCallBack(this->lRealPlayHandle, g_RealplayCallback, this);
     if (ret < 0)
     {
-        cout<<"set stream callback error "<<ret<<endl;
+        cout << "set stream callback error " << ret << endl;
         return HPR_ERROR;
     }
 
@@ -197,7 +199,13 @@ void Fetcher::exceptionCallBack(DWORD dwType)
     }
 }
 
-Fetcher::Fetcher(char *ip, int port, char *user, char *pwd, Cache *cache, Link *link)
+Fetcher::Fetcher()
+{
+    this->lUserID = -1;
+    this->link_ = NULL;
+}
+
+Fetcher::Fetcher(const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link)
 {
     this->ip = ip;
     this->user = user;
@@ -223,7 +231,10 @@ void Fetcher::Cleanup()
         NET_DVR_Cleanup();
     }
     this->lUserID = -1;
-    this->link_->stateDVR = false;
+    if (this->link_ != NULL)
+    {
+        this->link_->stateDVR = false;
+    }
 }
 
 void Fetcher::getAvgTime()
@@ -243,4 +254,5 @@ void Fetcher::getAvgTime()
     {
         this->times = 5;
     }
+}
 }

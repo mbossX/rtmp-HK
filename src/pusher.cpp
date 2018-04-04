@@ -1,9 +1,9 @@
 
 #include "pusher.h"
-#include <signal.h>
 
 // callback and re callback
-
+namespace streamPusher
+{
 #ifdef _WIN32
 DWORD WINAPI g_tCallback(LPVOID ptr)
 {
@@ -20,41 +20,25 @@ void *g_tCallback(void *ptr)
     {
         return ((Pusher *)ptr)->tCallback();
     }
+    cout<<21<<endl;
+    return NULL;
 }
 #endif
 
 int Pusher::init()
 {
     //init rtmp
-    this->rtmp = srs_rtmp_create(this->url_);
-#ifdef _WIN32
-    srs_rtmp_set_timeout(rtmp, 500, 500);
-#endif
-    int ret = srs_rtmp_handshake(this->rtmp);
-    if (ret != 0)
+    int ret = -1;
+    for (int i = 0; i < this->length; i++)
     {
-        cout << "rtmp handshake error " << ret << endl;
-        return ret;
+        ret = this->rtmp[i].Init();
+        if (ret != HPR_OK)
+        {
+            cout << "init the " << this->rtmp[i].id_ << " rtmp error " << ret << endl;
+            return ret;
+        }
     }
-    ret = srs_rtmp_connect_app(this->rtmp);
-    if (ret != 0)
-    {
-        cout << "rtmp connect app error " << ret << endl;
-        return ret;
-    }
-    ret = srs_rtmp_publish_stream(this->rtmp);
-    if (ret != 0)
-    {
-        cout << "rtmp publish stream error " << ret << endl;
-        return ret;
-    }
-    if (ret != HPR_OK)
-    {
-        cout << "init rtmp error " << ret << endl;
-        return ret;
-    }
-
-        // init thread
+    // init thread
 #ifdef _WIN32
     this->tid = CreateThread(NULL, 0, g_tCallback, this, 0, NULL);
     if (this->tid == FALSE)
@@ -85,9 +69,10 @@ int Pusher::start()
         return ret;
     }
     cout << "init rtmp success" << endl;
+    this->running = true;
 #ifdef _WIN32
     DWORD retW = WaitForSingleObject(this->tid, INFINITE);
-    if (ret != 0)
+    if (retW != 0)
     {
         this->tid = NULL;
         // restart
@@ -98,8 +83,9 @@ int Pusher::start()
     pthread_join(this->tid, &retT);
     if (retT != NULL)
     {
-        this->tid = NULL;
+        this->tid = 0;
         // restart
+        cout << "restart pusher!" << endl;
         return this->start();
     }
 #endif
@@ -112,10 +98,10 @@ void Pusher::stop()
 {
     if (this->rtmp != NULL)
     {
-        srs_rtmp_destroy(this->rtmp);
-#if (defined(_WIN32) || defined(_WIN_WCE)) || defined(__APPLE__)
-        WSACleanup();
-#endif
+        for (int i = 0; i < this->length; i++)
+        {
+            this->rtmp[i].Destroy();
+        }
     }
 
 #ifdef _WIN32
@@ -124,35 +110,58 @@ void Pusher::stop()
         CloseHandle(this->tid);
     }
 #elif defined(__linux__) || defined(__APPLE__)
-    if (this->tid > -1)
+    if (this->tid > 0)
     {
         pthread_exit(NULL);
-        this->tid = -1;
+        this->tid = 0;
     };
 #endif
 }
 #pragma endregion
 
-Pusher::Pusher(char *url, int fr, Cache *cache, Link *link)
+Pusher::Pusher()
 {
-    this->url_ = url;
-    this->fr_ = fr;
-    this->cache_ = cache;
-    this->link_ = link;
-    this->link_->frRTMP = fr;
-    this->dt = 0;
+    this->length = 0;
     this->rtmp = NULL;
-    this->times = 0;
 #ifdef _WIN32
     this->tid = NULL;
 #elif defined(__linux__) || defined(__APPLE__)
-    this->tid = -1;
+    this->tid = 0;
 #endif
+}
+
+Pusher::Pusher(Camera_ *c, Cache *cache, Link *link)
+{
+    this->id_ = c->id_.c_str();
+    // this->url_ = url;
+    this->fr_ = c->send_;
+    this->cache_ = cache;
+    this->link_ = link;
+    this->link_->frRTMP = c->fetch_;
+#ifdef _WIN32
+    this->tid = NULL;
+#elif defined(__linux__) || defined(__APPLE__)
+    this->tid = 0;
+#endif
+    this->times = 0;
+    this->dt = 0;
+    this->length = c->length;
+    this->running = false;
+    this->rtmp = new Rtmp[this->length];
+    for (int i = 0; i < this->length; i++)
+    {
+        this->rtmp[i] = Rtmp(c->rtmp[i].url_.c_str(), c->rtmp[i].id_.c_str());
+    }
 }
 
 Pusher::~Pusher()
 {
     this->stop();
+    if (this->rtmp != NULL)
+    {
+        cout << "deq " << 888 << endl;
+        delete[] this->rtmp;
+    }
 }
 
 int Pusher::send()
@@ -162,29 +171,23 @@ int Pusher::send()
         return 0;
     }
     VideoBuffer vb = this->cache_->pop();
-    int ret = srs_h264_write_raw_frames(this->rtmp, vb.buffer, vb.size, (unsigned int)this->dt, (unsigned int)this->dt);
-    vb.Free();
-    if (ret != 0)
+    int ret;
+    for (int i = 0; i < this->length; i++)
     {
-        if (srs_h264_is_dvbsp_error(ret) || srs_h264_is_duplicated_pps_error(ret) || srs_h264_is_duplicated_sps_error(ret))
+        ret = this->rtmp[i].send(vb.buffer, vb.size, this->dt);
+        if (ret != 0)
         {
-            ret = 0;
-        }
-        else
-        {
-            cout << "rtmp error " << ret << endl;
-            cout << "restart rtmp " << endl;
-            if (ret == 3041)
-            {
-                ret = 0;
-            }
+            goto end;
         }
     }
-    if (this->times++ % (6 * 300) == 0)
+
+end:
+    vb.Free();
+    if (this->times++ % (this->fr_ * 60 * 1) == 0)
     {
         cout << "avg: " << vb.avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
     }
-    this->dt += 1000 / this->fr_;
+    this->dt += 1000.0 / this->fr_;
     return ret;
 }
 
@@ -212,11 +215,13 @@ void *Pusher::tCallback()
         this->fr_ = this->link_->frDVR;
         if (0 != this->send())
         {
+            cout << "send fail and restart!" << endl;
             return (void *)1;
         }
-        float st = 1000 / this->fr_;
+        float st = 1000.0 / this->fr_;
         st *= ((float)this->cache_->capacity / this->cache_->size());
         this->doSleep(st);
     }
     return NULL;
+}
 }

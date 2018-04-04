@@ -29,7 +29,8 @@
 using namespace std;
 
 #include "../include/HCNetSDK.h"
-
+namespace streamPusher
+{
 class VideoBuffer
 {
     public:
@@ -72,5 +73,5 @@ class Link
         this->frRTMP = 6;
     }
 };
-
+}
 #endif

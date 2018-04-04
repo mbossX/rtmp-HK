@@ -12,12 +12,13 @@
 #define _NET_DVR_STREAM_H_
 
 #include "cache.h"
-
+namespace streamPusher
+{
 class Fetcher
 {
 public:
-  Fetcher() { this->lUserID = -1; };
-  Fetcher(char *ip, int port, char *user, char *pwd, Cache *cache, Link *link);
+  Fetcher();
+  Fetcher(const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link);
   ~Fetcher();
   void Cleanup();
   int Init();
@@ -28,9 +29,9 @@ public:
 private:
   long lRealPlayHandle;
   LONG lUserID;
-  char *ip;
-  char *user;
-  char *pwd;
+  const char *ip;
+  const char *user;
+  const char *pwd;
   int port;
   Cache *cache_;
   Link *link_;
@@ -42,4 +43,5 @@ private:
   int GetStream_V40();
   void getAvgTime();
 };
+}
 #endif

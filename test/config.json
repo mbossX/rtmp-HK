@@ -1,0 +1,21 @@
+{
+    "cameras": [
+        {
+            "id": "C001",
+            "cache": 5,
+            "ip": "172.16.1.205",
+            "port": 12202,
+            "user": "mboss",
+            "password": "mjl04140906",
+            "fetch": 10,
+            "send": 10,
+            "rtmp": [{
+                "id": "R001",
+                "url": "rtmp://172.16.1.90/live/R001"
+            },{
+                "id": "R002",
+                "url": "rtmp://172.16.1.90/live/R002"
+            }]
+        }
+    ]
+}
