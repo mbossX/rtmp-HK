@@ -193,7 +193,7 @@ end:
     vb.Free();
     if (this->times++ % (this->fr_ * 60 * 1) == 0)
     {
-        cout << "avgf: " << vb.avgTime << "	 avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
+        cout << "avgf: " << vb.avgTime << " avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
     }
     this->dt += 1000.0 / this->fr_;
     return ret;
@@ -219,7 +219,7 @@ void *Pusher::tCallback()
 {
     while (running)
     {
-		unsigned long time_ = srs_utils_time_ms();
+		unsigned long ttmp = srs_utils_time_ms();
         this->link_->frRTMP = this->link_->frDVR;
         this->fr_ = this->link_->frDVR;
         if (0 != this->send())
@@ -228,11 +228,11 @@ void *Pusher::tCallback()
             return (void *)1;
         }
 
+		unsigned long time_ = srs_utils_time_ms();
         float st = 1000.0 / this->fr_;
         st *= ((float)this->cache_->capacity / this->cache_->size());
-        this->doSleep(st - (time_ - this->lastTimes));
+        this->doSleep(st - (time_ - ttmp));
 		this->getAvgTime(time_);
-		this->lastTimes = time_;
     }
     return NULL;
 }
@@ -248,6 +248,7 @@ void Pusher::getAvgTime(unsigned long now)
 		this->avgTime = (float)(now - this->lastTimes);
 	}
 	this->times_++;
+    this->lastTimes = now;
 	if (this->times_ > 25)
 	{
 		this->times_ = 5;
