@@ -18,17 +18,17 @@ class Fetcher
 {
 public:
   Fetcher();
-  Fetcher(const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link);
+  Fetcher(int channel, const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link);
   ~Fetcher();
   void Cleanup();
   int Init();
   void RealDataCallBack_V40(NET_DVR_PACKET_INFO_EX *pack);
-  void RealDataCallBack_V402(DWORD dwDataType, BYTE *pBuffer, DWORD dwBufferSize);
   void exceptionCallBack(DWORD dwType);
 
 private:
   long lRealPlayHandle;
   LONG lUserID;
+  int channel;
   const char *ip;
   const char *user;
   const char *pwd;

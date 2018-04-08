@@ -101,10 +101,10 @@ int main(int argc, char **args)
 cleanup:
     if (cameras != NULL)
     {
-        for (int i = 0; i < config.length; i++)
+        /*for (int i = 0; i < config.length; i++)
         {
             cameras[i].Cleanup();
-        }
+        }*/
         delete[] cameras;
     }
     // fetcher.Cleanup();

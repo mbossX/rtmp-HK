@@ -40,7 +40,7 @@ class Camera
         }
         // init cache, link
         this->cache = Cache(this->config->cache_ * this->config->send_, &this->link);
-        this->fetcher = Fetcher(this->config->ip_.c_str(), this->config->port_, this->config->user_.c_str(), this->config->password_.c_str(), &this->cache, &this->link);
+        this->fetcher = Fetcher(this->config->channel_, this->config->ip_.c_str(), this->config->port_, this->config->user_.c_str(), this->config->password_.c_str(), &this->cache, &this->link);
         this->pusher = new Pusher(this->config, &this->cache, &this->link);
         // init dvr
         int ret = fetcher.Init();
@@ -61,7 +61,6 @@ class Camera
         if (ret != HPR_OK)
         {
             cout << "the " << this->config->id_ << " rtmp init error! " << ret << endl;
-            this->Cleanup();
             return HPR_ERROR;
         }
         return HPR_OK;

@@ -9,3 +9,4 @@ Release
 x64
 *.sdf
 .vscode
+.vs

@@ -25,6 +25,7 @@ struct Camera_
             delete[] this->rtmp;
         }
     }
+	int channel_;
     string id_;
     int cache_;
     string ip_;
@@ -37,6 +38,7 @@ struct Camera_
     int length;
     void from_json(const json &j)
     {
+		this->channel_ = j.at("channel").get<int>();
         this->id_ = j.at("id").get<std::string>();
         this->cache_ = j.at("cache").get<int>();
         this->ip_ = j.at("ip").get<std::string>();

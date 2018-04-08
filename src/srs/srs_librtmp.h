@@ -52,7 +52,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     typedef u_int32_t uint32_t;
     typedef int int32_t;
     typedef unsigned char u_int8_t;
+#if (_MSC_VER < 1900)
     typedef char int8_t;
+#endif
     typedef unsigned short u_int16_t;
     typedef short int16_t;
     typedef int64_t ssize_t;
@@ -1077,11 +1079,13 @@ typedef void* srs_hijack_io_t;
     // for file seek.
     #include <io.h>
     #include <fcntl.h>
+#if defined(_MSC_VER) && _MSC_VER<1900
     #define open _open
     #define close _close
     #define lseek _lseek
     #define write _write
     #define read _read
+#endif
     
     // for pid.
     typedef int pid_t;
@@ -1095,7 +1099,9 @@ typedef void* srs_hijack_io_t;
     int socket_cleanup();
     
     // others.
+#if defined(_MSC_VER) && _MSC_VER<1900
     #define snprintf _snprintf
+#endif
 #endif
 
 #ifdef __cplusplus

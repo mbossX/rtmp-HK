@@ -35,6 +35,7 @@ class Rtmp
             WSACleanup();
 #endif
         }
+		this->rtmp = NULL;
     }
 
 #pragma region init

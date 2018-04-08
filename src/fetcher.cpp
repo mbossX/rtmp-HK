@@ -162,7 +162,7 @@ int Fetcher::GetStream_V40()
 #elif defined(__linux__)
     preInfo.hPlayWnd = 0;
 #endif
-    preInfo.lChannel = 1;
+    preInfo.lChannel = this->channel;
     preInfo.dwStreamType = 0;
     preInfo.dwLinkMode = 0;
     preInfo.bBlocked = 1;
@@ -205,8 +205,9 @@ Fetcher::Fetcher()
     this->link_ = NULL;
 }
 
-Fetcher::Fetcher(const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link)
+Fetcher::Fetcher(int channel, const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link)
 {
+	this->channel = channel;
     this->ip = ip;
     this->user = user;
     this->pwd = pwd;

@@ -44,5 +44,14 @@
     <ClInclude Include="..\src\pusher.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\camera.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\config.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\srs\rtmp.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

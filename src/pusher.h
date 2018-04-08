@@ -21,7 +21,8 @@ public:
   void *tCallback();
 
 private:
-  Rtmp *rtmp;
+	void getAvgTime(unsigned long now);
+  Rtmp **rtmp;
   int length;
   Cache *cache_;
   Link *link_;
@@ -31,6 +32,9 @@ private:
   bool running;
   double dt;
   unsigned long times;
+  unsigned long lastTimes;
+  float avgTime;
+  unsigned long times_;
 #ifdef _WIN32
   HANDLE tid;
 #elif defined(__linux__) || defined(__APPLE__)
