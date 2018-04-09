@@ -122,10 +122,10 @@ void Fetcher::RealDataCallBack_V40(NET_DVR_PACKET_INFO_EX *pack)
     switch (pack->dwPacketType)
     {
     case 0: // head
-        cout << "head" << endl;
+        //cout << "head" << endl;
         break;
     case 2: // B
-        cout << "B Frame" << endl;
+        //cout << "B Frame" << endl;
         // break;
     case 1: // I
         // cout << "I Frame" << endl;

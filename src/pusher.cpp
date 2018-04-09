@@ -70,13 +70,13 @@ int Pusher::start()
     }
     cout << "init rtmp success" << endl;
 #ifdef _WIN32
-    DWORD retW = WaitForSingleObject(this->tid, INFINITE);
-    if (retW != 0)
-    {
-        this->tid = NULL;
-        // restart
-        return this->start();
-    }
+    // DWORD retW = WaitForSingleObject(this->tid, INFINITE);
+    // if (retW != 0)
+    // {
+    //     this->tid = NULL;
+    //     // restart
+    //     return this->start();
+    // }
 #elif defined(__linux__) || defined(__APPLE__)
     // void *retT;
     // pthread_join(this->tid, &retT);
@@ -192,7 +192,7 @@ int Pusher::send()
 
 end:
     vb.Free();
-    if (this->times++ % (this->fr_ * 60 * 1) == 0)
+    if (this->times++ % (this->fr_ * 60 * 1 / 10) == 0)
     {
         cout << this->id_ << "  avgf: " << vb.avgTime << " avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
     }
@@ -220,6 +220,7 @@ void *Pusher::tCallback()
 {
     while (running)
     {
+		//cout << this->id_ << endl;
 		unsigned long ttmp = srs_utils_time_ms();
         this->link_->frRTMP = this->link_->frDVR;
         this->fr_ = this->link_->frDVR;
@@ -235,6 +236,7 @@ void *Pusher::tCallback()
         this->doSleep(st - (time_ - ttmp));
 		this->getAvgTime();
     }
+	cout << "T out "<<this->id_ << endl;
     return NULL;
 }
 
