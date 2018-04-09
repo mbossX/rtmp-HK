@@ -232,13 +232,14 @@ void *Pusher::tCallback()
         float st = 1000.0 / this->fr_;
         st *= ((float)this->cache_->capacity / this->cache_->size());
         this->doSleep(st - (time_ - ttmp));
-		this->getAvgTime(time_);
+		this->getAvgTime();
     }
     return NULL;
 }
 
-void Pusher::getAvgTime(unsigned long now)
+void Pusher::getAvgTime()
 {
+	unsigned long now = srs_utils_time_ms();
 	if (this->times_ > 2)
 	{
 		this->avgTime = (this->avgTime + (float)(now - this->lastTimes) / (float)(this->times_ - 1)) * ((float)(this->times_ - 1) / (float)this->times_);

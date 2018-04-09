@@ -21,7 +21,7 @@ public:
   void *tCallback();
 
 private:
-	void getAvgTime(unsigned long now);
+	void getAvgTime();
   Rtmp **rtmp;
   int length;
   Cache *cache_;
