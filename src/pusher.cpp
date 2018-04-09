@@ -194,7 +194,7 @@ end:
     vb.Free();
     if (this->times++ % (this->fr_ * 60 * 1) == 0)
     {
-        cout << "avgf: " << vb.avgTime << " avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
+        cout << this->id_ << "  avgf: " << vb.avgTime << " avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
     }
     this->dt += 1000.0 / this->fr_;
     return ret;
