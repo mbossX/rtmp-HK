@@ -78,15 +78,15 @@ int Pusher::start()
         return this->start();
     }
 #elif defined(__linux__) || defined(__APPLE__)
-    void *retT;
-    pthread_join(this->tid, &retT);
-    if (retT != NULL)
-    {
-        this->tid = 0;
-        // restart
-        cout << "restart pusher!" << endl;
-        return this->start();
-    }
+    // void *retT;
+    // pthread_join(this->tid, &retT);
+    // if (retT != NULL)
+    // {
+    //     this->tid = 0;
+    //     // restart
+    //     cout << "restart pusher!" << endl;
+    //     return this->start();
+    // }
 #endif
     return 0;
 }
@@ -95,6 +95,7 @@ int Pusher::start()
 #pragma region stop
 void Pusher::stop()
 {
+	this->running = false;
     if (this->rtmp != NULL)
     {
         for (int i = 0; i < this->length; i++)

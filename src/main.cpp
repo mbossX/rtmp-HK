@@ -89,6 +89,14 @@ int main(int argc, char **args)
         goto cleanup;
     }
 
+    char input;
+    while(true){
+        cin >> input;
+        if(input == 'q'){
+            break;
+        }
+    }
+
     // #ifdef _WIN32
     //     system("pause");
     // #elif defined(__linux__) || defined(__APPLE__)
