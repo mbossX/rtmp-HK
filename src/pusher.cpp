@@ -20,7 +20,7 @@ void *g_tCallback(void *ptr)
     {
         return ((Pusher *)ptr)->tCallback();
     }
-    cout<<21<<endl;
+    cout << 21 << endl;
     return NULL;
 }
 #endif
@@ -38,7 +38,7 @@ int Pusher::init()
             return ret;
         }
     }
-    // init thread
+        // init thread
 #ifdef _WIN32
     this->tid = CreateThread(NULL, 0, g_tCallback, this, 0, NULL);
     if (this->tid == FALSE)
@@ -54,7 +54,7 @@ int Pusher::init()
         return HPR_ERROR;
     }
 #endif
-	this->running = true;
+    this->running = true;
 
     return HPR_OK;
 }
@@ -95,14 +95,15 @@ int Pusher::start()
 #pragma region stop
 void Pusher::stop()
 {
-	this->running = false;
+    this->running = false;
     if (this->rtmp != NULL)
     {
         for (int i = 0; i < this->length; i++)
         {
-			if (this->rtmp[i] != NULL) {
-				this->rtmp[i]->Destroy();
-			}
+            if (this->rtmp[i] != NULL)
+            {
+                this->rtmp[i]->Destroy();
+            }
         }
     }
 
@@ -145,14 +146,14 @@ Pusher::Pusher(Camera_ *c, Cache *cache, Link *link)
 #elif defined(__linux__) || defined(__APPLE__)
     this->tid = 0;
 #endif
-	this->times = 0;
-	this->times_ = 0;
-	this->avgTime = 0;
-	this->lastTimes = 0;
+    this->times = 0;
+    this->times_ = 0;
+    this->avgTime = 0;
+    this->lastTimes = 0;
     this->dt = 0;
     this->length = c->length;
     this->running = false;
-    this->rtmp = new Rtmp*[this->length];
+    this->rtmp = new Rtmp *[this->length];
     for (int i = 0; i < this->length; i++)
     {
         this->rtmp[i] = new Rtmp(c->rtmp[i].url_.c_str(), c->rtmp[i].id_.c_str());
@@ -165,10 +166,10 @@ Pusher::~Pusher()
     if (this->rtmp != NULL)
     {
         cout << "deq " << 888 << endl;
-		for (int i = 0; i < this->length; i++)
-		{
-			delete this->rtmp[i];
-		}
+        for (int i = 0; i < this->length; i++)
+        {
+            delete this->rtmp[i];
+        }
         delete[] this->rtmp;
     }
 }
@@ -192,7 +193,7 @@ int Pusher::send()
 
 end:
     vb.Free();
-    if (this->times++ % (this->fr_ * 60 * 1 / 10) == 0)
+    if (this->times++ % (this->fr_ * 60 * 1 / 1) == 0)
     {
         cout << this->id_ << "  avgf: " << vb.avgTime << " avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
     }
@@ -220,8 +221,7 @@ void *Pusher::tCallback()
 {
     while (running)
     {
-		//cout << this->id_ << endl;
-		unsigned long ttmp = srs_utils_time_ms();
+        unsigned long ttmp = srs_utils_time_ms();
         this->link_->frRTMP = this->link_->frDVR;
         this->fr_ = this->link_->frDVR;
         if (0 != this->send())
@@ -230,33 +230,31 @@ void *Pusher::tCallback()
             return (void *)1;
         }
 
-		unsigned long time_ = srs_utils_time_ms();
+        unsigned long time_ = srs_utils_time_ms();
         float st = 1000.0 / this->fr_;
         st *= ((float)this->cache_->capacity / this->cache_->size());
         this->doSleep(st - (time_ - ttmp));
-		this->getAvgTime();
+        this->getAvgTime();
     }
-	cout << "T out "<<this->id_ << endl;
     return NULL;
 }
 
 void Pusher::getAvgTime()
 {
-	unsigned long now = srs_utils_time_ms();
-	if (this->times_ > 2)
-	{
-		this->avgTime = (this->avgTime + (float)(now - this->lastTimes) / (float)(this->times_ - 1)) * ((float)(this->times_ - 1) / (float)this->times_);
-	}
-	else if (this->times_ == 2)
-	{
-		this->avgTime = (float)(now - this->lastTimes);
-	}
-	this->times_++;
+    unsigned long now = srs_utils_time_ms();
+    if (this->times_ > 2)
+    {
+        this->avgTime = (this->avgTime + (float)(now - this->lastTimes) / (float)(this->times_ - 1)) * ((float)(this->times_ - 1) / (float)this->times_);
+    }
+    else if (this->times_ == 2)
+    {
+        this->avgTime = (float)(now - this->lastTimes);
+    }
+    this->times_++;
     this->lastTimes = now;
-	if (this->times_ > 25)
-	{
-		this->times_ = 5;
-	}
+    if (this->times_ > 25)
+    {
+        this->times_ = 5;
+    }
 }
-
 }

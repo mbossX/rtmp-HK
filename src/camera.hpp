@@ -9,28 +9,49 @@ namespace streamPusher
 class Camera
 {
   private:
-    Camera_* config;
-    Link link;
-    Cache cache;
-    Fetcher fetcher;
+    Camera_ *config;
+    Link *link;
+    Cache *cache;
+    Fetcher *fetcher;
     Pusher *pusher;
+
   public:
-    Camera() {
+    Camera()
+    {
         config = NULL;
+        this->link = NULL;
+        this->cache = NULL;
+        this->fetcher = NULL;
         this->pusher = NULL;
     }
     Camera(Camera_ *c)
     {
         this->config = c;
+        this->link = NULL;
+        this->cache = NULL;
+        this->fetcher = NULL;
         this->pusher = NULL;
     }
-    ~Camera(){
+    ~Camera()
+    {
         this->Cleanup();
-        if(this->pusher != NULL){
+        if(this->fetcher != NULL){
+            delete this->fetcher;
+        }
+        if (this->pusher != NULL)
+        {
             delete this->pusher;
         }
+        if (this->link != NULL)
+        {
+            delete this->link;
+        }
+        if (this->cache != NULL)
+        {
+            delete this->cache;
+        }
     }
-    
+
     int start()
     {
         // no rtmp config
@@ -39,11 +60,12 @@ class Camera
             return HPR_ERROR;
         }
         // init cache, link
-        this->cache = Cache(this->config->cache_ * this->config->send_, &this->link);
-        this->fetcher = Fetcher(this->config->channel_, this->config->ip_.c_str(), this->config->port_, this->config->user_.c_str(), this->config->password_.c_str(), &this->cache, &this->link);
-        this->pusher = new Pusher(this->config, &this->cache, &this->link);
+        this->link = new Link();
+        this->cache = new Cache(this->config->cache_ * this->config->send_, this->link);
+        this->fetcher = new Fetcher(this->config->channel_, this->config->ip_.c_str(), this->config->port_, this->config->user_.c_str(), this->config->password_.c_str(), this->cache, this->link);
+        this->pusher = new Pusher(this->config, this->cache, this->link);
         // init dvr
-        int ret = fetcher.Init();
+        int ret = fetcher->Init();
         if (ret != HPR_OK)
         {
             cout << "init fetcher error " << ret << endl;
@@ -68,12 +90,15 @@ class Camera
 
     void Cleanup()
     {
-        this->fetcher.Cleanup();
-        if(this->pusher != NULL){
+        if (this->fetcher != NULL)
+        {
+            this->fetcher->Cleanup();
+        }
+        if (this->pusher != NULL)
+        {
             this->pusher->stop();
         }
     }
-
 };
 }
 
