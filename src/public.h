@@ -64,6 +64,7 @@ class Link
     float avgFetchTime;
     int frDVR;
     int frRTMP;
+    string id_;
     Link()
     {
         this->stateDVR = true;

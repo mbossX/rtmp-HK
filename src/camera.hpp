@@ -61,6 +61,7 @@ class Camera
         }
         // init cache, link
         this->link = new Link();
+        this->link->id_ = this->config->id_;
         this->cache = new Cache(this->config->cache_ * this->config->send_, this->link);
         this->fetcher = new Fetcher(this->config->channel_, this->config->ip_.c_str(), this->config->port_, this->config->user_.c_str(), this->config->password_.c_str(), this->cache, this->link);
         this->pusher = new Pusher(this->config, this->cache, this->link);

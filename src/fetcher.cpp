@@ -143,6 +143,7 @@ void Fetcher::RealDataCallBack_V40(NET_DVR_PACKET_INFO_EX *pack)
         this->link_->frDVR = pack->dwFrameRate;
         this->link_->avgFetchTime = this->avgTime;
         this->link_->stateDVR = true;
+        cout<<this->link_->id_<< " ";
         break;
     }
 }

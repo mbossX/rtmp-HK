@@ -178,7 +178,7 @@ int Pusher::send()
 {
     if (this->cache_->empty())
     {
-		cout << this->id_ << " ";
+		// cout << this->id_ << "--------- ";
         return 0;
     }
     VideoBuffer vb = this->cache_->pop();
