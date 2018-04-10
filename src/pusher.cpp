@@ -194,7 +194,7 @@ int Pusher::send()
 
 end:
     vb.Free();
-    if (this->times++ % (this->fr_ * 60 * 1 / 1) == 0)
+    if (this->times++ % (this->fr_ * 60 * 1 / 10) == 0)
     {
         cout << this->id_ << "  avgf: " << vb.avgTime << " avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
     }

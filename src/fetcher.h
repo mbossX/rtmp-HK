@@ -26,6 +26,7 @@ public:
   void exceptionCallBack(DWORD dwType);
 
 private:
+  static bool inited;
   long lRealPlayHandle;
   LONG lUserID;
   int channel;

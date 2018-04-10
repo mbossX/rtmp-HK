@@ -85,13 +85,19 @@ void CALLBACK g_ExceptionCallBack(DWORD dwType, LONG lUserID, LONG lHandle, void
     }
 }
 
+bool Fetcher::inited = false;
+
 int Fetcher::Init()
 {
     this->Cleanup();
-    NET_DVR_Init();
-    NET_DVR_SetConnectTime(2000, 2);
-    NET_DVR_SetReconnect(10000, true);
-    NET_DVR_SetExceptionCallBack_V30(0, NULL, g_ExceptionCallBack, NULL);
+    if (!Fetcher::inited)
+    {
+        NET_DVR_Init();
+        NET_DVR_SetConnectTime(2000, 2);
+        NET_DVR_SetReconnect(10000, true);
+        Fetcher::inited = true;
+    }
+    NET_DVR_SetExceptionCallBack_V30(0, NULL, g_ExceptionCallBack, this);
     //Login device
     NET_DVR_DEVICEINFO_V40 struDeviceInfo = {0};
     NET_DVR_USER_LOGIN_INFO info = {0};
@@ -143,7 +149,7 @@ void Fetcher::RealDataCallBack_V40(NET_DVR_PACKET_INFO_EX *pack)
         this->link_->frDVR = pack->dwFrameRate;
         this->link_->avgFetchTime = this->avgTime;
         this->link_->stateDVR = true;
-		//cout << this->link_->id_ << " ";
+        //cout << this->link_->id_ << " ";
         break;
     }
 }
@@ -208,7 +214,7 @@ Fetcher::Fetcher()
 
 Fetcher::Fetcher(int channel, const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link)
 {
-	this->channel = channel;
+    this->channel = channel;
     this->ip = ip;
     this->user = user;
     this->pwd = pwd;
@@ -222,6 +228,11 @@ Fetcher::Fetcher(int channel, const char *ip, int port, const char *user, const 
 Fetcher::~Fetcher()
 {
     this->Cleanup();
+    if (Fetcher::inited)
+    {
+        NET_DVR_Cleanup();
+        Fetcher::inited = false;
+    }
 }
 
 void Fetcher::Cleanup()
@@ -230,7 +241,6 @@ void Fetcher::Cleanup()
     {
         NET_DVR_StopRealPlay(this->lRealPlayHandle);
         NET_DVR_Logout_V30(this->lUserID);
-        NET_DVR_Cleanup();
     }
     this->lUserID = -1;
     if (this->link_ != NULL)
