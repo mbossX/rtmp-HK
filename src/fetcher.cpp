@@ -87,39 +87,72 @@ void CALLBACK g_ExceptionCallBack(DWORD dwType, LONG lUserID, LONG lHandle, void
 
 bool Fetcher::inited = false;
 
+void Fetcher::GetChannel(const char *ip, int port, const char *user, const char *pwd)
+{
+	NET_DVR_Init();
+	//Login device
+	NET_DVR_DEVICEINFO_V40 struDeviceInfo = { 0 };
+	NET_DVR_USER_LOGIN_INFO info = { 0 };
+	info.bUseAsynLogin = 0;
+	strcpy(info.sDeviceAddress, ip);
+	info.wPort = port;
+	strcpy(info.sUserName, user);
+	strcpy(info.sPassword, pwd);
+
+	long lUserID = NET_DVR_Login_V40(&info, &struDeviceInfo);
+	if (lUserID < 0)
+	{
+		cout << "***pyd---Login error " << NET_DVR_GetLastError() << endl;
+	}
+	cout << "***channel start:	" << (int)struDeviceInfo.struDeviceV30.byStartChan << endl;
+	cout << "***channel  num:	" << (int)struDeviceInfo.struDeviceV30.byChanNum << endl;
+	cout << "***IP channel start:	" << (int)struDeviceInfo.struDeviceV30.byStartDChan << endl;
+	cout << "***IP channel num:	" << (int)struDeviceInfo.struDeviceV30.byHighDChanNum * 256 + (int)struDeviceInfo.struDeviceV30.byIPChanNum << endl;
+
+	NET_DVR_Logout_V30(lUserID);
+	NET_DVR_Cleanup();
+}
+
 int Fetcher::Init()
 {
-    this->Cleanup();
-    if (!Fetcher::inited)
-    {
-        NET_DVR_Init();
-        NET_DVR_SetConnectTime(2000, 2);
-        NET_DVR_SetReconnect(10000, true);
-        Fetcher::inited = true;
-    }
-    NET_DVR_SetExceptionCallBack_V30(0, NULL, g_ExceptionCallBack, this);
-    //Login device
-    NET_DVR_DEVICEINFO_V40 struDeviceInfo = {0};
-    NET_DVR_USER_LOGIN_INFO info = {0};
-    info.bUseAsynLogin = 0;
-    strcpy(info.sDeviceAddress, this->ip);
-    info.wPort = this->port;
-    strcpy(info.sUserName, this->user);
-    strcpy(info.sPassword, this->pwd);
+	this->Cleanup();
+	if (!Fetcher::inited)
+	{
+		NET_DVR_Init();
+		NET_DVR_SetConnectTime(2000, 2);
+		NET_DVR_SetReconnect(10000, true);
+		Fetcher::inited = true;
+	}
+	NET_DVR_SetExceptionCallBack_V30(0, NULL, g_ExceptionCallBack, this);
+	//Login device
+	NET_DVR_DEVICEINFO_V40 struDeviceInfo = { 0 };
+	NET_DVR_USER_LOGIN_INFO info = { 0 };
+	info.bUseAsynLogin = 0;
+	strcpy(info.sDeviceAddress, this->ip);
+	info.wPort = this->port;
+	strcpy(info.sUserName, this->user);
+	strcpy(info.sPassword, this->pwd);
 
-    this->lUserID = NET_DVR_Login_V40(&info, &struDeviceInfo);
-    if (this->lUserID < 0)
-    {
-        cout << "pyd---Login error " << NET_DVR_GetLastError() << endl;
-        return NET_DVR_GetLastError();
-    }
+	this->lUserID = NET_DVR_Login_V40(&info, &struDeviceInfo);
+	if (this->lUserID < 0)
+	{
+		cout << "***pyd---Login error " << this->channel << " with " << NET_DVR_GetLastError() << endl;
+		return NET_DVR_GetLastError();
+	}
+	cout << "***login success " << this->channel << " with user " << this->lUserID << endl;
+	/*cout << "***channel start:	" << (int)struDeviceInfo.struDeviceV30.byStartChan << endl;
+	cout << "***channel  num:	" << (int)struDeviceInfo.struDeviceV30.byChanNum << endl;
+	cout << "***IP channel start:	" << (int)struDeviceInfo.struDeviceV30.byStartDChan << endl;
+	cout << "***IP channel num:	" << (int)struDeviceInfo.struDeviceV30.byHighDChanNum * 256 + (int)struDeviceInfo.struDeviceV30.byIPChanNum << endl;*/
 
-    if (this->GetStream_V40() != HPR_OK)
-    {
-        cout << "pyd---GetStream error " << NET_DVR_GetLastError() << endl;
-        return NET_DVR_GetLastError();
-    }
-    return HPR_OK;
+	this->reset();
+
+	if (this->GetStream_V40() != HPR_OK)
+	{
+		cout << "***pyd---GetStream error " << this->channel << " with " << NET_DVR_GetLastError() << endl;
+		return NET_DVR_GetLastError();
+	}
+	return HPR_OK;
 }
 
 void Fetcher::RealDataCallBack_V40(NET_DVR_PACKET_INFO_EX *pack)
@@ -128,20 +161,20 @@ void Fetcher::RealDataCallBack_V40(NET_DVR_PACKET_INFO_EX *pack)
     switch (pack->dwPacketType)
     {
     case 0: // head
-        //cout << "head" << endl;
+        //cout << "***head" << endl;
         break;
     case 2: // B
-        //cout << "B Frame" << endl;
+        //cout << "***B Frame" << endl;
         // break;
     case 1: // I
-        // cout << "I Frame" << endl;
+        // cout << "***I Frame" << endl;
         // for (int i = 0; i < 30; i++)
         // {
         //     cout << (int)pack->pPacketBuffer[i];
         // }
         // cout << endl;
     case 3: // P
-        // cout << "P Frame" << endl;
+        // cout << "***P Frame" << endl;
         VideoBuffer vb((char *)pack->pPacketBuffer, pack->dwPacketSize, pack->dwTimeStamp, pack->dwFrameRate, this->avgTime);
         vb.frameType = pack->dwPacketType;
         this->cache_->push(vb);
@@ -184,7 +217,7 @@ int Fetcher::GetStream_V40()
     int ret = NET_DVR_SetESRealPlayCallBack(this->lRealPlayHandle, g_RealplayCallback, this);
     if (ret < 0)
     {
-        cout << "set stream callback error " << ret << endl;
+        cout << "***set stream callback error " << ret << endl;
         return HPR_ERROR;
     }
 
@@ -197,7 +230,7 @@ void Fetcher::exceptionCallBack(DWORD dwType)
     switch (dwType)
     {
     case EXCEPTION_RECONNECT: //reconnect
-        cout << "pyd----------reconnect-------- " << time(NULL) << endl;
+        cout << "***pyd----------reconnect-------- " << time(NULL) << endl;
         this->link_->stateDVR = false;
         this->Init();
         break;
@@ -212,8 +245,9 @@ Fetcher::Fetcher()
     this->link_ = NULL;
 }
 
-Fetcher::Fetcher(int channel, const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link)
+Fetcher::Fetcher(int channel, const char *ip, int port, const char *user, const char *pwd, int bitrate, int framerate, int resolution, Cache *cache, Link *link)
 {
+	this->lUserID = -1;
     this->channel = channel;
     this->ip = ip;
     this->user = user;
@@ -223,6 +257,9 @@ Fetcher::Fetcher(int channel, const char *ip, int port, const char *user, const 
     this->link_ = link;
     this->lastTime = 0;
     this->times = 0;
+	this->bitrate_ = bitrate;
+	this->framerate_ = framerate;
+	this->resolution_ = resolution;
 }
 
 Fetcher::~Fetcher()
@@ -241,14 +278,39 @@ void Fetcher::Cleanup()
     {
         NET_DVR_StopRealPlay(this->lRealPlayHandle);
         NET_DVR_Logout_V30(this->lUserID);
+		this->lUserID = -1;
     }
-    this->lUserID = -1;
     if (this->link_ != NULL)
     {
         this->link_->stateDVR = false;
     }
 }
-
+void Fetcher::reset() {
+	if (this->lUserID < 0) {
+		return;
+	}
+	int iRet;   //获取压缩参数 
+	DWORD dwReturnLen;
+	NET_DVR_COMPRESSIONCFG_V30 struParams = { 0 };
+	iRet = NET_DVR_GetDVRConfig(this->lUserID, NET_DVR_GET_COMPRESSCFG_V30, this->channel, &struParams, \
+		sizeof(NET_DVR_COMPRESSIONCFG_V30), &dwReturnLen);
+	if (!iRet)
+	{
+		cout<<"get "<<this->channel<< " config error of " << NET_DVR_GetLastError() << ", user is " << this->lUserID <<endl;
+		return;
+	}
+	//设置压缩参数 
+	struParams.struNormHighRecordPara.dwVideoBitrate = this->bitrate_;
+	struParams.struNormHighRecordPara.dwVideoFrameRate = this->framerate_;
+	struParams.struNormHighRecordPara.byResolution = this->resolution_;
+	iRet = NET_DVR_SetDVRConfig(this->lUserID, NET_DVR_SET_COMPRESSCFG_V30, this->channel, \
+		&struParams, sizeof(NET_DVR_COMPRESSIONCFG_V30));
+	if (!iRet)
+	{
+		cout << "***set " << this->channel << "config error of " << NET_DVR_GetLastError() << endl;
+		return;
+	}
+}
 void Fetcher::getAvgTime()
 {
     unsigned long now = TIMESTAMP;

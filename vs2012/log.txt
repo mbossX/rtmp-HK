@@ -1,0 +1,16 @@
+***login success 1 with user 0
+***init rtmp success
+***start camera T000 success!
+***T000  avgf: 6.97959e-39 avgp: 0  qsize: 30   6
+***login success 1 with user 1
+***init rtmp success
+***start camera T001 success!
+***T001  avgf: 1.17973e-34 avgp: 0  qsize: 32   6
+***login success 1 with user 2
+***init rtmp success
+***start camera T002 success!
+***T002  avgf: 0 avgp: 0  qsize: 30   6
+***login success 1 with user 3
+***init rtmp success
+***start camera T003 success!
+***T003  avgf: 0 avgp: 0  qsize: 31   6

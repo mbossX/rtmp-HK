@@ -34,7 +34,7 @@ int Pusher::init()
         ret = this->rtmp[i]->Init();
         if (ret != HPR_OK)
         {
-            cout << "init the " << this->rtmp[i]->id_ << " rtmp error " << ret << endl;
+            cout << "***init the " << this->rtmp[i]->id_ << " rtmp error " << ret << endl;
             return ret;
         }
     }
@@ -43,14 +43,14 @@ int Pusher::init()
     this->tid = CreateThread(NULL, 0, g_tCallback, this, 0, NULL);
     if (this->tid == FALSE)
     {
-        cout << "init thread error " << ret << endl;
+        cout << "***init thread error " << ret << endl;
         return HPR_ERROR;
     }
 #elif defined(__linux__) || defined(__APPLE__)
     ret = pthread_create(&this->tid, NULL, g_tCallback, this);
     if (0 != ret)
     {
-        cout << "init thread error " << ret << endl;
+        cout << "***init thread error " << ret << endl;
         return HPR_ERROR;
     }
 #endif
@@ -68,7 +68,7 @@ int Pusher::start()
     {
         return ret;
     }
-    cout << "init rtmp success" << endl;
+    cout << "***init rtmp success" << endl;
 #ifdef _WIN32
     // DWORD retW = WaitForSingleObject(this->tid, INFINITE);
     // if (retW != 0)
@@ -84,7 +84,7 @@ int Pusher::start()
     // {
     //     this->tid = 0;
     //     // restart
-    //     cout << "restart pusher!" << endl;
+    //     cout << "***restart pusher!" << endl;
     //     return this->start();
     // }
 #endif
@@ -165,7 +165,7 @@ Pusher::~Pusher()
     this->stop();
     if (this->rtmp != NULL)
     {
-        cout << "deq " << 888 << endl;
+        cout << "***deq " << 888 << endl;
         for (int i = 0; i < this->length; i++)
         {
             delete this->rtmp[i];
@@ -194,9 +194,9 @@ int Pusher::send()
 
 end:
     vb.Free();
-    if (this->times++ % (this->fr_ * 60 * 1 / 10) == 0)
+    if (this->times++ % (this->fr_ * 60 * 5 / 1) == 0)
     {
-        cout << this->id_ << "  avgf: " << vb.avgTime << " avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
+        cout << "***" << this->id_ << "  avgf: " << vb.avgTime << " avgp: " << this->avgTime << "  qsize: " << this->cache_->size() << "   " << this->fr_ << endl;
     }
     this->dt += 1000.0 / this->fr_;
     return ret;
@@ -227,7 +227,7 @@ void *Pusher::tCallback()
         this->fr_ = this->link_->frDVR;
         if (0 != this->send())
         {
-            cout << "send fail and restart!" << endl;
+            cout << "***send fail and restart!" << endl;
             return (void *)1;
         }
 

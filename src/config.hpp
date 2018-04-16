@@ -32,6 +32,9 @@ struct Camera_
     int port_;
     string user_;
     string password_;
+	int framerate_;
+	int bitrate_;
+	int resolution_;
     int fetch_;
     int send_;
     Rtmp_ *rtmp;
@@ -45,7 +48,10 @@ struct Camera_
         this->port_ = j.at("port").get<int>();
         this->user_ = j.at("user").get<std::string>();
         this->password_ = j.at("password").get<std::string>();
-        this->fetch_ = j.at("fetch").get<int>();
+		this->framerate_ = j.at("framerate").get<int>();
+		this->resolution_ = j.at("resolution").get<int>();
+		this->bitrate_ = j.at("bitrate").get<int>();
+		this->fetch_ = j.at("fetch").get<int>();
         this->send_ = j.at("send").get<int>();
         json rtmp = j.at("rtmp");
         if (rtmp.is_array())

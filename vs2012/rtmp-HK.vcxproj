@@ -159,6 +159,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\fetcher.cpp" />
+    <ClCompile Include="..\src\log.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\pusher.cpp" />
     <ClCompile Include="..\src\srs\srs_librtmp.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="..\src\camera.hpp" />
     <ClInclude Include="..\src\config.hpp" />
     <ClInclude Include="..\src\fetcher.h" />
+    <ClInclude Include="..\src\log.h" />
     <ClInclude Include="..\src\public.h" />
     <ClInclude Include="..\src\pusher.h" />
     <ClInclude Include="..\src\srs\rtmp.hpp" />

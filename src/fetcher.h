@@ -18,12 +18,14 @@ class Fetcher
 {
 public:
   Fetcher();
-  Fetcher(int channel, const char *ip, int port, const char *user, const char *pwd, Cache *cache, Link *link);
+  Fetcher(int channel, const char *ip, int port, const char *user, const char *pwd, int bitrate, int framerate, int resolution, Cache *cache, Link *link);
   ~Fetcher();
   void Cleanup();
+  static void GetChannel(const char *ip, int port, const char *user, const char *pwd);
   int Init();
   void RealDataCallBack_V40(NET_DVR_PACKET_INFO_EX *pack);
   void exceptionCallBack(DWORD dwType);
+  void reset();
 
 private:
   static bool inited;
@@ -34,6 +36,9 @@ private:
   const char *user;
   const char *pwd;
   int port;
+  int bitrate_;
+  int framerate_;
+  int resolution_;
   Cache *cache_;
   Link *link_;
 

@@ -1,34 +1,84 @@
 {
     "cameras": [
         {
-            "id": "C001",
+            "id": "T000",
             "channel": 1,
             "cache": 5,
             "ip": "172.16.1.205",
             "port": 12202,
             "user": "mboss",
             "password": "mjl04140906",
-            "fetch": 10,
-            "send": 10,
-            "rtmp": [{
-                "id": "T002",
-                "url": "rtmp://172.16.1.90:20009/live/T002"
-            }]
+            "framerate": 8,
+            "bitrate": 19,
+            "resolution": 20,
+            "fetch": 6,
+            "send": 6,
+            "rtmp": [
+                {
+                    "id": "R001",
+                    "url": "rtmp://172.16.1.90:20009/live/R001"
+                }
+            ]
         },
         {
-            "id": "C002",
+            "id": "T001",
             "channel": 1,
             "cache": 5,
             "ip": "172.16.1.205",
             "port": 12202,
             "user": "mboss",
             "password": "mjl04140906",
-            "fetch": 10,
-            "send": 10,
-            "rtmp": [{
-                "id": "T001",
-                "url": "rtmp://172.16.1.90:20009/live/T001"
-            }]
+            "framerate": 8,
+            "bitrate": 19,
+            "resolution": 20,
+            "fetch": 6,
+            "send": 6,
+            "rtmp": [
+                {
+                    "id": "R002",
+                    "url": "rtmp://172.16.1.90:20009/live/R002"
+                }
+            ]
+        },
+        {
+            "id": "T002",
+            "channel": 1,
+            "cache": 5,
+            "ip": "172.16.1.205",
+            "port": 12202,
+            "user": "mboss",
+            "password": "mjl04140906",
+            "framerate": 8,
+            "bitrate": 19,
+            "resolution": 20,
+            "fetch": 6,
+            "send": 6,
+            "rtmp": [
+                {
+                    "id": "R003",
+                    "url": "rtmp://172.16.1.90:20009/live/R003"
+                }
+            ]
+        },
+        {
+            "id": "T003",
+            "channel": 1,
+            "cache": 5,
+            "ip": "172.16.1.205",
+            "port": 12202,
+            "user": "mboss",
+            "password": "mjl04140906",
+            "framerate": 8,
+            "bitrate": 19,
+            "resolution": 20,
+            "fetch": 6,
+            "send": 6,
+            "rtmp": [
+                {
+                    "id": "R004",
+                    "url": "rtmp://172.16.1.90:20009/live/R004"
+                }
+            ]
         }
     ]
 }

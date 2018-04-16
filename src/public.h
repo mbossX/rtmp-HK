@@ -62,6 +62,7 @@ class Link
     bool stateDVR;
     bool stateRTMP;
     float avgFetchTime;
+
     int frDVR;
     int frRTMP;
     char* id_;

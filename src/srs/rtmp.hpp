@@ -44,7 +44,7 @@ class Rtmp
         this->rtmp = srs_rtmp_create(this->url_);
         if (this->rtmp == NULL)
         {
-            cout << "create rtmp error!" << endl;
+            cout << "***create rtmp error!" << endl;
             return -1;
         }
 #ifdef _WIN32
@@ -53,24 +53,24 @@ class Rtmp
         int ret = srs_rtmp_handshake(this->rtmp);
         if (ret != HPR_OK)
         {
-            cout << "rtmp handshake error " << ret << endl;
+            cout << "***rtmp handshake error " << ret << endl;
             return ret;
         }
         ret = srs_rtmp_connect_app(this->rtmp);
         if (ret != HPR_OK)
         {
-            cout << "rtmp connect app error " << ret << endl;
+            cout << "***rtmp connect app error " << ret << endl;
             return ret;
         }
         ret = srs_rtmp_publish_stream(this->rtmp);
         if (ret != 0)
         {
-            cout << "rtmp publish stream error " << ret << endl;
+            cout << "***rtmp publish stream error " << ret << endl;
             return ret;
         }
         if (ret != HPR_OK)
         {
-            cout << "init rtmp error " << ret << endl;
+            cout << "***init rtmp error " << ret << endl;
             return ret;
         }
         return HPR_OK;
@@ -98,14 +98,14 @@ class Rtmp
             }
             else
             {
-                cout << "the " << this->id_ << " rtmp error " << ret << endl;
+                cout << "***the " << this->id_ << " rtmp error " << ret << endl;
                 if (ret == 3041)
                 {
                     ret = 0;
                 }
                 else
                 {
-                    cout << "the " << this->id_ << " rtmp restart!" << endl;
+                    cout << "***the " << this->id_ << " rtmp restart!" << endl;
                     this->Destroy();
                     return this->Init();
                 }

@@ -16,6 +16,7 @@ class Camera
     Pusher *pusher;
 
   public:
+	  bool inited;
     Camera()
     {
         config = NULL;
@@ -54,6 +55,7 @@ class Camera
 
     int start()
     {
+		this->inited = false;
         // no rtmp config
         if (this->config->length < 1)
         {
@@ -63,17 +65,19 @@ class Camera
         this->link = new Link();
         this->link->id_ = (char*)this->config->id_.c_str();
         this->cache = new Cache(this->config->cache_ * this->config->send_, this->link);
-        this->fetcher = new Fetcher(this->config->channel_, this->config->ip_.c_str(), this->config->port_, this->config->user_.c_str(), this->config->password_.c_str(), this->cache, this->link);
+        this->fetcher = new Fetcher(this->config->channel_, this->config->ip_.c_str(), this->config->port_, this->config->user_.c_str(), 
+			this->config->password_.c_str(), this->config->bitrate_, this->config->framerate_,this->config->resolution_, this->cache, this->link);
         this->pusher = new Pusher(this->config, this->cache, this->link);
         // init dvr
+		//fetcher->GetChannel();
         int ret = fetcher->Init();
         if (ret != HPR_OK)
         {
-            cout << "init fetcher error " << ret << endl;
+            cout << "***init fetcher error " << ret << endl;
             this->Cleanup();
             return ret;
         }
-        cout << "init the " << this->config->id_ << " dvr success!" << endl;
+        //cout << "***init the " << this->config->id_ << " dvr success!" << endl;
 
 #ifdef _WIN32
         Sleep(this->config->cache_ * ((float)this->config->send_ / (float)this->config->fetch_) * 1000);
@@ -83,11 +87,18 @@ class Camera
         ret = this->pusher->start();
         if (ret != HPR_OK)
         {
-            cout << "the " << this->config->id_ << " rtmp init error! " << ret << endl;
+            cout << "***the " << this->config->id_ << " rtmp init error! " << ret << endl;
             return HPR_ERROR;
         }
+		this->inited = true;
         return HPR_OK;
     }
+
+	void pingpong() {
+		if (this->config->framerate_ != this->link->frDVR) {
+			this->fetcher->reset();
+		}
+	}
 
     void Cleanup()
     {

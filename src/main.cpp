@@ -19,9 +19,9 @@
 #include <iostream>
 #include <fstream>
 #include "camera.hpp"
+#include "log.h"
 using namespace std;
 using namespace streamPusher;
-
 int main(int argc, char **args)
 {
     // int fr_send = 6;
@@ -48,6 +48,36 @@ int main(int argc, char **args)
         ]
     }
     */
+	cout << "place select function:" << "\n\t0  start push" << "\n\t1  get channels" << endl;
+    int input;
+	cin >> input;
+	if (input == 1) {
+		string ip;
+		cout << "input ip:" << endl;
+		cin >> ip;
+		int port;
+		cout << "input port:" << endl;
+		cin >> port;
+		string user;
+		cout << "input user:" << endl;
+		cin >> user;
+		string pwd;
+		cout << "input password:" << endl;
+		cin >> pwd;
+		Fetcher::GetChannel(ip.c_str(), port, user.c_str(), pwd.c_str());
+	}
+
+#ifdef _WIN32
+	HWND hwnd;
+	hwnd = FindWindow(L"ConsoleWindowClass", NULL);
+	if (hwnd)
+	{
+		ShowOwnedPopups(hwnd, SW_HIDE);
+		ShowWindow(hwnd, SW_HIDE);
+	}
+#endif
+
+	Log::start();
     json cJson;
     if (argc > 1)
     {
@@ -55,13 +85,13 @@ int main(int argc, char **args)
         infile.open(args[1]);
         if (!infile.is_open())
         {
-            cout << "config file " << args[1] << " did not exists!" << endl;
+            cout << "***config file " << args[1] << " did not exists!" << endl;
             return 1;
         }
         string data((istreambuf_iterator<char>(infile)),
                     istreambuf_iterator<char>());
 
-        // cout << "config is" << endl
+        // cout << "***config is" << endl
         //      << data << endl;
         infile.close();
         using json = nlohmann::json;
@@ -75,26 +105,36 @@ int main(int argc, char **args)
             cameras[i] = Camera(&config.cameras[i]);
             if (cameras[i].start() != HPR_OK)
             {
-                cout << "camera " << config.cameras[i].id_ << " start fail!" << endl;
+                cout << "***camera " << config.cameras[i].id_ << " start fail!" << endl;
             }
             else
             {
-                cout << "start camera " << config.cameras[i].id_ << " success!" << endl;
+                cout << "***start camera " << config.cameras[i].id_ << " success!" << endl;
             }
         }
     }
     else
     {
-        cout << "need config file!" << endl;
+        cout << "***need config file!" << endl;
         goto cleanup;
     }
 
-    char input;
     while(true){
-        cin >> input;
+#ifdef _WIN32
+		Sleep(5 * 1000);
+#elif defined(__linux__) || defined(__APPLE__)
+		usleep(5 * 1000 * 1000);
+#endif
+		for (int i = 0; i < config.length; i++)
+		{
+			if (cameras[i].inited) {
+				cameras[i].pingpong();
+			}
+		}
+        /*cin >> input;
         if(input == 'q'){
             break;
-        }
+        }*/
     }
 
     // #ifdef _WIN32
@@ -115,6 +155,7 @@ cleanup:
         }*/
         delete[] cameras;
     }
+	Log::close();
     // fetcher.Cleanup();
     // pusher.stop();
     return 0;
